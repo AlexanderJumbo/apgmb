@@ -31,32 +31,6 @@ const Index = () => {
     experience: "",
   });
 
-  /* useEffect(() => {
-    const meters = async () => {
-      const res = await fetch(`${BASE_URL}meter`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        //body: JSON.stringify({ username: email, password }),
-      });
-
-      if (!res.ok) throw new Error("Credenciales inválidas");
-
-      const data = await res.json();
-      console.log("🚀 ~ meters ~ data:", data);
-      const dataMapped = data.map((item: any) => ({
-        key: item.meterId,
-        value: item.serial,
-      }));
-      setMetersList(dataMapped);
-      return data;
-    };
-
-    meters();
-  }, []); */
-
   useFocusEffect(
     useCallback(() => {
       const meters = async () => {
@@ -74,10 +48,17 @@ const Index = () => {
           const data = await res.json();
           console.log("🚀 ~ meters ~ data:", data);
 
-          const dataMapped = data.map((item: any) => ({
-            key: item.meterId.toString(), // importante que sea string
-            value: item.serial,
-          }));
+          const dataMapped = data
+            .filter(
+              (item: any) =>
+                item.serial !== null &&
+                item.serial !== undefined &&
+                item.serial !== ""
+            )
+            .map((item: any) => ({
+              key: item.meterId.toString(),
+              value: item.serial,
+            }));
 
           setMetersList(dataMapped);
         } catch (error) {
@@ -94,15 +75,46 @@ const Index = () => {
     }, [jwt]) // se vuelve a ejecutar si cambia el token
   );
 
+  useEffect(() => {
+    if (!form.meter) return;
+    const user = async () => {
+      try {
+        const res = await fetch(
+          `${BASE_URL}account/userbymeter/${form.meter}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+          }
+        );
+
+        if (!res.ok) {
+          setForm((prevForm) => ({
+            ...prevForm,
+            name: "",
+          }));
+          throw new Error("Credenciales inválidas");
+        }
+
+        const data = await res.json();
+        setForm((prevForm) => ({
+          ...prevForm,
+          name: data.fullname,
+        }));
+        console.log("🚀 ~ userrrrr ~ data:", data);
+      } catch (error) {
+        console.error("Error al obtener medidores:", error);
+      }
+    };
+
+    user();
+  }, [form.meter, jwt]);
+
   const handleChange = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
   };
-
-  const dropdownData = [
-    { key: "1", value: "Option 1" },
-    { key: "2", value: "Option 2" },
-    { key: "3", value: "Option 3" },
-  ];
 
   return (
     <SafeAreaView className="flex-1 bg-[#F7F8FA]">
@@ -111,6 +123,15 @@ const Index = () => {
           <Text className="text-2xl font-bold text-black mb-4">
             Registrar lectura
           </Text>
+
+          <SelectList
+            setSelected={(val: string) => handleChange("meter", val)}
+            data={metersList}
+            save="key"
+            boxStyles={{ backgroundColor: "#f3f4f6", borderRadius: 12 }}
+            dropdownStyles={{ backgroundColor: "#f3f4f6", borderRadius: 12 }}
+            placeholder="Seleccione un medidor"
+          />
 
           <Text className="text-black mb-1">Name</Text>
           <TextInput
@@ -137,39 +158,6 @@ const Index = () => {
             value={form.phone}
             onChangeText={(text) => handleChange("phone", text)}
           />
-
-          <SelectList
-            setSelected={(val: string) => handleChange("meter", val)}
-            data={metersList}
-            save="value"
-            boxStyles={{ backgroundColor: "#f3f4f6", borderRadius: 12 }}
-            dropdownStyles={{ backgroundColor: "#f3f4f6", borderRadius: 12 }}
-            placeholder="Seleccione un medidor"
-          />
-
-          {[
-            "Institute",
-            "Education",
-            "Job title",
-            "Organization",
-            "Years of experience",
-          ].map((label, i) => (
-            <View key={i} className="mb-3">
-              <Text className="text-black mb-1">{label}</Text>
-              <SelectList
-                setSelected={(val: string) =>
-                  handleChange(label.toLowerCase().replace(/ /g, ""), val)
-                }
-                data={metersList}
-                save="value"
-                boxStyles={{ backgroundColor: "#f3f4f6", borderRadius: 12 }}
-                dropdownStyles={{
-                  backgroundColor: "#f3f4f6",
-                  borderRadius: 12,
-                }}
-              />
-            </View>
-          ))}
           {/* bg-red-500 */}
           <TouchableOpacity className="mt-6 bg-[#1C1C1E] rounded-xl p-3">
             <Text className="text-white text-center font-semibold">SUBMIT</Text>
