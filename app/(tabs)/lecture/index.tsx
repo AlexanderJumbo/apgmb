@@ -11,6 +11,7 @@ import { SelectList } from "react-native-dropdown-select-list";
 import { BASE_URL } from "@/config";
 import { useAuthStore } from "@/store/authStore";
 import { useFocusEffect } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 const Index = () => {
   const jwt = useAuthStore((state) => state.jwt);
@@ -22,7 +23,9 @@ const Index = () => {
   const [form, setForm] = useState({
     meter: "",
     name: "",
-    email: "",
+    prevLecture: 2350,
+    currentLecture: 0,
+    observation: "",
     phone: "",
     institute: "",
     education: "",
@@ -30,6 +33,8 @@ const Index = () => {
     organization: "",
     experience: "",
   });
+
+  console.log("form.currentLecture", form.currentLecture);
 
   useFocusEffect(
     useCallback(() => {
@@ -112,7 +117,9 @@ const Index = () => {
     user();
   }, [form.meter, jwt]);
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string | number) => {
+    console.log("🚀 ~ handleChange ~ value:", value);
+    console.log("🚀 ~ handleChange ~ field:", field);
     setForm({ ...form, [field]: value });
   };
 
@@ -133,33 +140,103 @@ const Index = () => {
             placeholder="Seleccione un medidor"
           />
 
-          <Text className="text-black mb-1">Name</Text>
+          <Text className="text-black mb-1">Cliente</Text>
           <TextInput
-            placeholder="Enter your name"
+            placeholder="Nombre del dueño del medidor"
             className="bg-gray-100 p-3 rounded-xl mb-3"
             value={form.name}
             onChangeText={(text) => handleChange("name", text)}
+            editable={false}
           />
 
-          <Text className="text-black mb-1">Email</Text>
+          <Text className="text-black mb-1">Lectura anterior</Text>
           <TextInput
-            placeholder="Enter your email"
+            placeholder="Valor de lectura del mes anterior"
             className="bg-gray-100 p-3 rounded-xl mb-3"
-            keyboardType="email-address"
-            value={form.email}
-            onChangeText={(text) => handleChange("email", text)}
+            keyboardType="numeric"
+            value={form.prevLecture.toString() ?? ""}
+            onChangeText={(prevLecture) =>
+              handleChange("prevLecture", Number(prevLecture))
+            }
+            editable={false}
           />
 
-          <Text className="text-black mb-1">Phone number</Text>
+          <Text className="text-black mb-1">Lectura actual</Text>
           <TextInput
-            placeholder="Enter your phone"
+            placeholder="Valor de lectura del mes actual"
             className="bg-gray-100 p-3 rounded-xl mb-3"
-            keyboardType="phone-pad"
-            value={form.phone}
-            onChangeText={(text) => handleChange("phone", text)}
+            keyboardType="numeric"
+            value={form.currentLecture.toString() ?? ""}
+            onChangeText={(currentLecture) =>
+              handleChange("currentLecture", Number(currentLecture))
+            }
           />
+
+          <Text className="text-black mb-1">Observación</Text>
+          <TextInput
+            placeholder="Ingrese una observación en caso de anomalías"
+            className="bg-gray-100 p-3 rounded-xl mb-3"
+            value={form.observation}
+            onChangeText={(observation) =>
+              handleChange("observation", observation)
+            }
+            multiline
+            numberOfLines={6}
+          />
+          {/* <Text className="text-base font-bold text-black">
+            Consumo actual:{" "}
+            {Math.max(0, form.currentLecture - form.prevLecture)}
+          </Text> */}
+
+          <View className="mt-2 p-3 bg-gray-100 rounded-xl">
+            <Text className="text-black mb-1">Resumen</Text>
+            {form.currentLecture === 0 ? (
+              <Text className="text-base text-gray-500 italic">
+                Sin lectura ingresada aún
+              </Text>
+            ) : (
+              <>
+                <Text className="text-base font-bold text-black">
+                  Consumo actual:{" "}
+                  {/* {Math.max(0, form.currentLecture - form.prevLecture)} m³ */}
+                  {form.currentLecture - form.prevLecture} m³
+                </Text>
+                <Text className="text-sm text-gray-500 mt-1">
+                  Fecha: {new Date().toLocaleDateString()}
+                </Text>
+                {form.currentLecture < form.prevLecture && (
+                  <Text className="text-sm text-red-600 mt-1">
+                    Lectura actual puede presentar un error de digitación, antes
+                    de guardar por favor asegúrese de haber ingresado los
+                    valores correctos
+                  </Text>
+                )}
+              </>
+            )}
+          </View>
+
           {/* bg-red-500 */}
-          <TouchableOpacity className="mt-6 bg-[#1C1C1E] rounded-xl p-3">
+          <TouchableOpacity
+            className="mt-6 bg-[#1C1C1E] rounded-xl p-3"
+            onPress={() => {
+              if (form.currentLecture <= form.prevLecture) {
+                Toast.show({
+                  type: "error",
+                  text1: "Posible lectura ERRÓNEA",
+                  text2: "Verifique los datos antes de guardar",
+                });
+              } else {
+                Toast.show({
+                  type: "success",
+                  text1: "Lectura registrada",
+                  text2: "Tu lectura fue enviada correctamente 👌",
+                });
+
+                // Aquí podrías enviar al backend, por ejemplo:
+                // await saveLecture(form)
+              }
+            }}
+          >
             <Text className="text-white text-center font-semibold">SUBMIT</Text>
           </TouchableOpacity>
         </View>

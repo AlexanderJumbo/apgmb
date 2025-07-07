@@ -1,10 +1,22 @@
-import CustomButton from "@/components/shared/CustomButton";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Dimensions,
+} from "react-native";
 
 import { login } from "@/services/auth/authService";
 import { useAuthStore } from "@/store/authStore";
+
+const { height: screenHeight } = Dimensions.get("window");
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -33,29 +45,97 @@ const Login = () => {
     }
   };
 
+  const androidKeyboardOffset = Platform.select({
+    ios: 0, // iOS maneja mejor el offset automáticamente con "padding" o "height"
+    android: -screenHeight * 0.15, // Un valor negativo para empujar el contenido hacia arriba
+    // Puedes ajustar 0.25 (25% de la altura de la pantalla)
+    // o probar un valor fijo como -150
+  });
+
   return (
-    <SafeAreaView>
-      <View className="px-10 mt-5 bg-slate-100">
-        <Text className="text-3xl text-center">Bienvenido a APGMB</Text>
-        <TextInput
-          onChangeText={setUsername}
-          placeholder="Ingresa tu email aquí"
-        />
-        <TextInput
-          onChangeText={setPassword}
-          placeholder="Ingresa tu contraseña aquí"
-          secureTextEntry
-        />
-        <CustomButton onPress={() => handleLogin()}>
-          Iniciar sesión
-        </CustomButton>
-        {hasErrors && (
-          <Text className="text-center text-red-600">
-            Usuario y/o contraseña incorrectos{" "}
-          </Text>
-        )}
-      </View>
-    </SafeAreaView>
+    <KeyboardAvoidingView
+      className="flex-1"
+      // Usa "padding" para ambas plataformas para un comportamiento más consistente.
+      // "height" también podría funcionar, pero "padding" suele ser más flexible.
+      behavior={Platform.OS === "ios" ? "padding" : "padding"}
+      // Aplica el offset condicional.
+      keyboardVerticalOffset={androidKeyboardOffset}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View className="flex-1 bg-white relative">
+          {/* Fondo rosa fijo */}
+          <View
+            className="absolute top-0 left-0 right-0 bg-[#0cc6bd] h-[300px] rounded-b-[60px]"
+            style={{ zIndex: 0 }}
+          />
+
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+            // Desactiva el desplazamiento visual por defecto si no es deseado,
+            // pero mantenlo para poder scrollear si hay muchos inputs.
+            // Para una experiencia más controlada, a veces se puede jugar con `scrollEnabled`
+            // pero para formularios, lo mejor es dejarlo habilitado.
+          >
+            {/* Contenido encima del fondo */}
+            <View
+              className="flex-1 justify-end relative"
+              style={{ zIndex: 1, marginTop: 150 }}
+            >
+              <View className="px-10 bg-white pb-10 rounded-t-[40px]">
+                <Text className="text-3xl text-center font-bold mb-8">
+                  Sign in
+                </Text>
+
+                <Text className="text-sm mb-1">Email</Text>
+                <TextInput
+                  onChangeText={setUsername}
+                  value={username}
+                  placeholder="demo@email.com"
+                  className="bg-gray-100 rounded-lg p-3 mb-4"
+                />
+
+                <Text className="text-sm mb-1">Password</Text>
+                <TextInput
+                  onChangeText={setPassword}
+                  value={password}
+                  placeholder="Enter your password"
+                  secureTextEntry
+                  className="bg-gray-100 rounded-lg p-3 mb-4"
+                />
+
+                <View className="flex-row justify-between items-center mb-4">
+                  <Text className="text-sm text-gray-600">Remember Me</Text>
+                  <Text className="text-sm text-[#0cc6bd]">
+                    Forgot Password?
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={handleLogin}
+                  className="bg-[#0cc6bd] rounded-xl py-3"
+                >
+                  <Text className="text-white text-center text-base font-bold">
+                    Login
+                  </Text>
+                </TouchableOpacity>
+
+                {hasErrors && (
+                  <Text className="text-center text-red-600 mt-4">
+                    Usuario y/o contraseña incorrectos
+                  </Text>
+                )}
+
+                <Text className="text-center text-sm mt-6 text-gray-600">
+                  Don&apos;t have an account?{" "}
+                  <Text className="text-[#0cc6bd] font-semibold">Sign up</Text>
+                </Text>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
