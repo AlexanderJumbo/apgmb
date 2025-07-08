@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -13,8 +14,12 @@ import { useAuthStore } from "@/store/authStore";
 import { useFocusEffect } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 
+import { StatusBar } from "expo-status-bar";
+import { saveLecture } from "@/services/lecture/lecture";
+
 const Index = () => {
   const jwt = useAuthStore((state) => state.jwt);
+  const userId = useAuthStore((state) => state.userId);
   console.log("🚀 ~ Index ~ jwt:", jwt);
 
   const [metersList, setMetersList] = useState([]);
@@ -26,12 +31,8 @@ const Index = () => {
     prevLecture: 2350,
     currentLecture: 0,
     observation: "",
-    phone: "",
-    institute: "",
-    education: "",
-    job: "",
-    organization: "",
-    experience: "",
+    accountLecture: 0,
+    operator: Number(userId),
   });
 
   console.log("form.currentLecture", form.currentLecture);
@@ -109,6 +110,32 @@ const Index = () => {
           name: data.fullname,
         }));
         console.log("🚀 ~ userrrrr ~ data:", data);
+
+        const res2 = await fetch(
+          `${BASE_URL}account/by-user/${data.idUsuario}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+          }
+        );
+
+        if (!res2.ok) {
+          setForm((prevForm) => ({
+            ...prevForm,
+            accountLecture: 0,
+          }));
+          throw new Error("Credenciales inválidas");
+        }
+
+        const data2 = await res2.json();
+        setForm((prevForm) => ({
+          ...prevForm,
+          accountLecture: data2.accountId,
+        }));
+        console.log("🚀 ~ user ~ res2:", data2);
       } catch (error) {
         console.error("Error al obtener medidores:", error);
       }
@@ -123,8 +150,42 @@ const Index = () => {
     setForm({ ...form, [field]: value });
   };
 
+  const registerLecture = async () => {
+    if (form.currentLecture <= form.prevLecture) {
+      Toast.show({
+        type: "error",
+        text1: "Posible lectura ERRÓNEA",
+        text2: "Verifique los datos antes de guardar",
+      });
+    }
+    const newForm = {
+      prevLecture: form.prevLecture,
+      currentLecture: form.currentLecture,
+      observation: form.observation,
+      accountLecture: form.accountLecture,
+      operator: form.operator,
+    };
+    const response = await saveLecture(newForm, jwt || "");
+    if (response.idLecture === 0 || response.idLecture === null) {
+      Toast.show({
+        type: "error",
+        text1: "No puedo se registrada la lectura",
+        text2: "Verifique los datos antes de guardar",
+      });
+    } else {
+      Toast.show({
+        type: "success",
+        text1: "Lectura registrada",
+        text2: "Tu lectura fue enviada correctamente 👌",
+      });
+      // Aquí podrías enviar al backend, por ejemplo:
+      // await saveLecture(form)
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-[#F7F8FA]">
+      <StatusBar style={Platform.OS === "ios" ? "dark" : "auto"} translucent />
       <ScrollView contentContainerStyle={{ padding: 20 }} className="flex-1">
         <View className="bg-white rounded-3xl p-6 shadow-xl">
           <Text className="text-2xl font-bold text-black mb-4">
@@ -218,24 +279,7 @@ const Index = () => {
           {/* bg-red-500 */}
           <TouchableOpacity
             className="mt-6 bg-[#1C1C1E] rounded-xl p-3"
-            onPress={() => {
-              if (form.currentLecture <= form.prevLecture) {
-                Toast.show({
-                  type: "error",
-                  text1: "Posible lectura ERRÓNEA",
-                  text2: "Verifique los datos antes de guardar",
-                });
-              } else {
-                Toast.show({
-                  type: "success",
-                  text1: "Lectura registrada",
-                  text2: "Tu lectura fue enviada correctamente 👌",
-                });
-
-                // Aquí podrías enviar al backend, por ejemplo:
-                // await saveLecture(form)
-              }
-            }}
+            onPress={registerLecture}
           >
             <Text className="text-white text-center font-semibold">SUBMIT</Text>
           </TouchableOpacity>
