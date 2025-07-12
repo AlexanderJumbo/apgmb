@@ -25,6 +25,7 @@ export interface AccountForm {
   phone: string;
   meterNumber: string;
   meterMark: string;
+  predialCode: string;
   role: string;
 }
 
@@ -59,6 +60,7 @@ const AccountModal = ({
     phone: "",
     meterNumber: "",
     meterMark: "",
+    predialCode: "",
     role: "CLIENT",
   });
   console.log("🚀 ~ form:", form);
@@ -103,6 +105,7 @@ const AccountModal = ({
           phone: "",
           meterNumber: "",
           meterMark: "",
+          predialCode: "",
           role: "",
         });
       } else if (defaultValues) {
@@ -119,6 +122,7 @@ const AccountModal = ({
           phone: defaultValues.phone || "",
           meterNumber: defaultValues.meterNumber || "",
           meterMark: defaultValues.meterMark || "",
+          predialCode: defaultValues.predialCode || "",
           role: defaultValues.role || "",
         });
       }
@@ -226,6 +230,13 @@ const AccountModal = ({
                   className="bg-gray-100 p-3 rounded-xl mb-3"
                   value={form.meterMark}
                   onChangeText={(val) => handleChange("meterMark", val)}
+                />
+                <Text className="text-black mb-1">Código predial</Text>
+                <TextInput
+                  placeholder="Marca que aparece en el medidor"
+                  className="bg-gray-100 p-3 rounded-xl mb-3"
+                  value={form.predialCode}
+                  onChangeText={(val) => handleChange("predialCode", val)}
                 />
               </View>
             )}

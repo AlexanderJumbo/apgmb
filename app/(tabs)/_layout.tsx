@@ -28,7 +28,7 @@ export default function Layout() {
           name="home/index"
           options={{
             segment: "home",
-            title: "Inicios",
+            title: "Inicio",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),
@@ -48,9 +48,9 @@ export default function Layout() {
           name="lecture/index"
           options={{
             segment: "lecture",
-            title: "Favoritos",
+            title: "Lectura",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="heart-outline" size={size} color={color} />
+              <Ionicons name="book-outline" size={size} color={color} />
             ),
           }}
         />
@@ -58,7 +58,7 @@ export default function Layout() {
           name="client/index"
           options={{
             segment: "client",
-            title: "Cuenta",
+            title: "Perfil",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="person-outline" size={size} color={color} />
             ),
@@ -68,9 +68,9 @@ export default function Layout() {
           name="account/index"
           options={{
             href: "/account",
-            title: "Bolsa",
+            title: "Cuentas",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="cart-outline" size={size} color={color} />
+              <Ionicons name="save-outline" size={size} color={color} />
             ),
           }}
         />
