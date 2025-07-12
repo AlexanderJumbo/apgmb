@@ -28,7 +28,7 @@ const Index = () => {
   const [form, setForm] = useState({
     meter: "",
     name: "",
-    prevLecture: 2350,
+    prevLecture: 0,
     currentLecture: 0,
     observation: "",
     accountLecture: 0,
@@ -85,21 +85,21 @@ const Index = () => {
     if (!form.meter) return;
     const user = async () => {
       try {
-        const res = await fetch(
-          `${BASE_URL}account/userbymeter/${form.meter}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-            },
-          }
-        );
+        const res = await fetch(`${BASE_URL}account/by-meter/${form.meter}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
 
         if (!res.ok) {
           setForm((prevForm) => ({
             ...prevForm,
             name: "",
+            accountLecture: 0,
+            prevLecture: 0,
+            currentLecture: 0,
           }));
           throw new Error("Credenciales inválidas");
         }
@@ -107,35 +107,38 @@ const Index = () => {
         const data = await res.json();
         setForm((prevForm) => ({
           ...prevForm,
-          name: data.fullname,
+          name: data.name + " " + data.lastName,
+          accountLecture: data.accountId,
+          prevLecture: data.previousLecture ?? 0,
+          currentLecture: 0,
         }));
         console.log("🚀 ~ userrrrr ~ data:", data);
 
-        const res2 = await fetch(
-          `${BASE_URL}account/by-user/${data.idUsuario}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-            },
-          }
-        );
+        // const res2 = await fetch(
+        //   `${BASE_URL}account/by-user/${data.idUsuario}`,
+        //   {
+        //     method: "GET",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: `Bearer ${jwt}`,
+        //     },
+        //   }
+        // );
 
-        if (!res2.ok) {
-          setForm((prevForm) => ({
-            ...prevForm,
-            accountLecture: 0,
-          }));
-          throw new Error("Credenciales inválidas");
-        }
+        // if (!res2.ok) {
+        //   setForm((prevForm) => ({
+        //     ...prevForm,
+        //     accountLecture: 0,
+        //   }));
+        //   throw new Error("Credenciales inválidas");
+        // }
 
-        const data2 = await res2.json();
-        setForm((prevForm) => ({
-          ...prevForm,
-          accountLecture: data2.accountId,
-        }));
-        console.log("🚀 ~ user ~ res2:", data2);
+        // const data2 = await res2.json();
+        // setForm((prevForm) => ({
+        //   ...prevForm,
+        //   accountLecture: data2.accountId,
+        // }));
+        //console.log("🚀 ~ user ~ res2:", data2);
       } catch (error) {
         console.error("Error al obtener medidores:", error);
       }
@@ -205,7 +208,7 @@ const Index = () => {
           <TextInput
             placeholder="Nombre del dueño del medidor"
             className="bg-gray-100 p-3 rounded-xl mb-3"
-            value={form.name}
+            value={form.name ?? ""}
             onChangeText={(text) => handleChange("name", text)}
             editable={false}
           />
@@ -215,7 +218,7 @@ const Index = () => {
             placeholder="Valor de lectura del mes anterior"
             className="bg-gray-100 p-3 rounded-xl mb-3"
             keyboardType="numeric"
-            value={form.prevLecture.toString() ?? ""}
+            value={form.prevLecture?.toString() ?? 0}
             onChangeText={(prevLecture) =>
               handleChange("prevLecture", Number(prevLecture))
             }
@@ -227,7 +230,7 @@ const Index = () => {
             placeholder="Valor de lectura del mes actual"
             className="bg-gray-100 p-3 rounded-xl mb-3"
             keyboardType="numeric"
-            value={form.currentLecture.toString() ?? ""}
+            value={form.currentLecture.toString() ?? 0}
             onChangeText={(currentLecture) =>
               handleChange("currentLecture", Number(currentLecture))
             }
