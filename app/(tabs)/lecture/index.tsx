@@ -24,6 +24,7 @@ const Index = () => {
 
   const [metersList, setMetersList] = useState([]);
   console.log("🚀 ~ Index ~ metersList:", metersList);
+  const [hasCurrentLecture, setHasCurrentLecture] = useState(false);
 
   const [form, setForm] = useState({
     meter: "",
@@ -113,6 +114,21 @@ const Index = () => {
           currentLecture: 0,
         }));
         console.log("🚀 ~ userrrrr ~ data:", data);
+
+        const hasLectureRequest = await fetch(
+          `${BASE_URL}lecture/lastByAccount/${data.accountId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+          }
+        );
+
+        const hasLecture = await hasLectureRequest.json();
+        console.log("🚀 ~ user ~ hasLecture:", hasLecture);
+        setHasCurrentLecture(hasLecture);
 
         // const res2 = await fetch(
         //   `${BASE_URL}account/by-user/${data.idUsuario}`,
@@ -255,8 +271,12 @@ const Index = () => {
           <View className="mt-2 p-3 bg-gray-100 rounded-xl">
             <Text className="text-black mb-1">Resumen</Text>
             {form.currentLecture === 0 ? (
-              <Text className="text-base text-gray-500 italic">
-                Sin lectura ingresada aún
+              <Text
+                className={`text-base ${hasCurrentLecture ? "text-red-600 mt-1" : "text-gray-500"} italic`}
+              >
+                {hasCurrentLecture
+                  ? "Este medidor ya posee una lectura para el mes actual, por lo que ya no podrá registrar una nueva"
+                  : "Sin lectura ingresada aún"}
               </Text>
             ) : (
               <>
@@ -281,8 +301,9 @@ const Index = () => {
 
           {/* bg-red-500 */}
           <TouchableOpacity
-            className="mt-6 bg-[#1C1C1E] rounded-xl p-3"
+            className={`mt-6 ${hasCurrentLecture ? "bg-[#454547]" : "bg-[#1C1C1E]"} rounded-xl p-3`}
             onPress={registerLecture}
+            disabled={hasCurrentLecture}
           >
             <Text className="text-white text-center font-semibold">SUBMIT</Text>
           </TouchableOpacity>

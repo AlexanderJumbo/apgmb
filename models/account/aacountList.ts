@@ -12,5 +12,6 @@ export type AccountList = {
     meterMark: string;
     predialCode: string;
     dateRegister: null;
+    nameSector: string,
     active: boolean;
 }

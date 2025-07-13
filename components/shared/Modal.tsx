@@ -1,5 +1,5 @@
 // components/AccountModal.tsx
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Modal,
   ScrollView,
@@ -12,6 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { SelectList } from "react-native-dropdown-select-list";
 import { saveAccount, updateAccount } from "@/services/account/account";
 import { useAuthStore } from "@/store/authStore";
+import { useFocusEffect } from "@react-navigation/native";
+import { BASE_URL } from "@/config";
 
 export interface AccountForm {
   accountId: number;
@@ -26,6 +28,7 @@ export interface AccountForm {
   meterNumber: string;
   meterMark: string;
   predialCode: string;
+  nameSector: string;
   role: string;
 }
 
@@ -47,6 +50,7 @@ const AccountModal = ({
   console.log("🚀 ~ defaultValueaaaaas:", defaultValues);
   const jwt = useAuthStore((state) => state.jwt);
   const [currentStep, setCurrentStep] = useState(0);
+  const [sectorsList, setSectorsList] = useState([]);
 
   const [form, setForm] = useState<AccountForm>({
     accountId: 0,
@@ -61,6 +65,7 @@ const AccountModal = ({
     meterNumber: "",
     meterMark: "",
     predialCode: "",
+    nameSector: "",
     role: "CLIENT",
   });
   console.log("🚀 ~ form:", form);
@@ -87,7 +92,41 @@ const AccountModal = ({
     }
   };
 
-  const tiposClientes = [{ key: "CLIENT", value: "CLIENT", disabled: true }];
+  const tiposClientes = [{ key: "CLIENT", value: "CLIENTE", disabled: true }];
+
+  const getAllSectors = async (jwt: string) => {
+    const res = await fetch(`${BASE_URL}sector/all`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    if (!res.ok) throw new Error("Ocurrió un error");
+    const data = await res.json();
+    console.log("getAllSectors", data);
+
+    const dataMapped = data
+      .filter(
+        (item: any) =>
+          item.nameSector !== null &&
+          item.nameSector !== undefined &&
+          item.nameSector !== ""
+      )
+      .map((item: any) => ({
+        key: item.nameSector, //item.sectorId.toString(),
+        value: item.nameSector,
+      }));
+
+    setSectorsList(dataMapped);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      getAllSectors(jwt ?? "");
+      return () => {};
+    }, [jwt])
+  );
 
   useEffect(() => {
     if (visible) {
@@ -106,6 +145,7 @@ const AccountModal = ({
           meterNumber: "",
           meterMark: "",
           predialCode: "",
+          nameSector: "",
           role: "",
         });
       } else if (defaultValues) {
@@ -123,6 +163,7 @@ const AccountModal = ({
           meterNumber: defaultValues.meterNumber || "",
           meterMark: defaultValues.meterMark || "",
           predialCode: defaultValues.predialCode || "",
+          nameSector: defaultValues.nameSector || "",
           role: defaultValues.role || "",
         });
       }
@@ -233,10 +274,29 @@ const AccountModal = ({
                 />
                 <Text className="text-black mb-1">Código predial</Text>
                 <TextInput
-                  placeholder="Marca que aparece en el medidor"
+                  placeholder="Ingrese código predial"
                   className="bg-gray-100 p-3 rounded-xl mb-3"
                   value={form.predialCode}
                   onChangeText={(val) => handleChange("predialCode", val)}
+                />
+                <Text className="text-black mb-1">Sector</Text>
+                <SelectList
+                  setSelected={(val: string) => handleChange("nameSector", val)}
+                  data={sectorsList}
+                  save="key"
+                  boxStyles={{
+                    backgroundColor: "#f3f4f6",
+                    borderRadius: 12,
+                    marginBottom: 12,
+                  }}
+                  dropdownStyles={{
+                    backgroundColor: "#f3f4f6",
+                    borderRadius: 12,
+                  }}
+                  defaultOption={sectorsList.find(
+                    (s) => s.key === form.nameSector
+                  )}
+                  placeholder="Selecciona el sector"
                 />
               </View>
             )}
