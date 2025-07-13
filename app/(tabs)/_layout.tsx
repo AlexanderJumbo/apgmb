@@ -27,7 +27,7 @@ export default function Layout() {
         <Tabs.Screen
           name="home/index"
           options={{
-            segment: "home",
+            //segment: "home",
             title: "Inicio",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="home-outline" size={size} color={color} />
@@ -35,19 +35,9 @@ export default function Layout() {
           }}
         />
         <Tabs.Screen
-          name="meter/index"
-          options={{
-            segment: "meter",
-            title: "Buscar",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="search-outline" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="lecture/index"
           options={{
-            segment: "lecture",
+            //segment: "lecture",
             title: "Lectura",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="book-outline" size={size} color={color} />
@@ -55,22 +45,22 @@ export default function Layout() {
           }}
         />
         <Tabs.Screen
-          name="client/index"
+          name="account/index"
           options={{
-            segment: "client",
-            title: "Perfil",
+            //segment: "account",
+            title: "Cuentas",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="person-outline" size={size} color={color} />
+              <Ionicons name="save-outline" size={size} color={color} />
             ),
           }}
         />
         <Tabs.Screen
-          name="account/index"
+          name="client/index"
           options={{
-            href: "/account",
-            title: "Cuentas",
+            //segment: "client",
+            title: "Perfil",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="save-outline" size={size} color={color} />
+              <Ionicons name="person-outline" size={size} color={color} />
             ),
           }}
         />

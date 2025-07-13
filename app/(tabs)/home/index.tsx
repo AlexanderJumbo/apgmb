@@ -1,5 +1,8 @@
 import {
+  Dimensions,
+  Image,
   SafeAreaView,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -32,41 +35,34 @@ const HomeScreen = () => {
     { name: "Bag", icon: "cart-outline" },
   ];
 
+  const screenHeight = Dimensions.get("window").height;
+  const imageHeight = screenHeight * 0.7;
+
   return (
-    <SafeAreaView className="flex-1 items-center justify-between bg-white px-4">
-      <View>
-        <Text>Home Page</Text>
-      </View>
-      {/* Contenido de prueba */}
-      {/* <View className="flex-1 justify-center items-center">
-        <Text className="text-xl">Pantalla principal</Text>
+    <ScrollView className="flex-1">
+      <View
+        className="items-center justify-center"
+        style={{ height: imageHeight }}
+      >
+        <Image
+          source={require("../../../assets/images/balao_bg.png")} // reemplaza con tu ruta
+          resizeMode="contain"
+          className="w-full h-full"
+        />
       </View>
 
-      <View className="flex-row justify-around border-t border-gray-300 bg-white w-full py-2">
-        {tabs.map((tab) => {
-          const isActive = changeTab === tab.name;
-
-          return (
-            <TouchableOpacity
-              key={tab.name}
-              className="items-center justify-center"
-              onPress={() => changeTabClick(tab.name)}
-            >
-              <Ionicons
-                name={tab.icon}
-                size={24}
-                color={isActive ? "#000" : "#999"}
-              />
-              <Text
-                className={`text-xs ${isActive ? "text-black font-semibold" : "text-gray-400"}`}
-              >
-                {tab.name}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View> */}
-    </SafeAreaView>
+      <View className="p-4 bg-white rounded-t-2xl -mt-6">
+        <Text className="text-xl font-bold text-green-900 mb-2">
+          GAD Municipal de Balao
+        </Text>
+        <Text className="text-base text-gray-700 leading-relaxed">
+          El Gobierno Autónomo Descentralizado de Balao se destaca por su
+          compromiso con la comunidad, impulsando el desarrollo sostenible de la
+          región. En su escudo se reflejan elementos clave como la agricultura,
+          la pesca y la identidad cultural.
+        </Text>
+      </View>
+    </ScrollView>
   );
 };
 

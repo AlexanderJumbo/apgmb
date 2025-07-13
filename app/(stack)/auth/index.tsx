@@ -47,7 +47,7 @@ const Login = () => {
 
   const androidKeyboardOffset = Platform.select({
     ios: 0, // iOS maneja mejor el offset automáticamente con "padding" o "height"
-    android: -screenHeight * 0.15, // Un valor negativo para empujar el contenido hacia arriba
+    android: -screenHeight * 0.1, // Un valor negativo para empujar el contenido hacia arriba
     // Puedes ajustar 0.25 (25% de la altura de la pantalla)
     // o probar un valor fijo como -150
   });
@@ -84,39 +84,39 @@ const Login = () => {
             >
               <View className="px-10 bg-white pb-10 rounded-t-[40px]">
                 <Text className="text-3xl text-center font-bold mb-8">
-                  Sign in
+                  Iniciar sesión
                 </Text>
 
-                <Text className="text-sm mb-1">Email</Text>
+                <Text className="text-sm mb-1">Usuario</Text>
                 <TextInput
                   onChangeText={setUsername}
                   value={username}
-                  placeholder="demo@email.com"
+                  placeholder="Ingresa tu nombre de usuario aquí"
                   className="bg-gray-100 rounded-lg p-3 mb-4"
                 />
 
-                <Text className="text-sm mb-1">Password</Text>
+                <Text className="text-sm mb-1">Contraseña</Text>
                 <TextInput
                   onChangeText={setPassword}
                   value={password}
-                  placeholder="Enter your password"
+                  placeholder="Ingresa tu contraseña"
                   secureTextEntry
                   className="bg-gray-100 rounded-lg p-3 mb-4"
                 />
 
-                <View className="flex-row justify-between items-center mb-4">
+                {/* <View className="flex-row justify-between items-center mb-4">
                   <Text className="text-sm text-gray-600">Remember Me</Text>
                   <Text className="text-sm text-[#0cc6bd]">
                     Forgot Password?
                   </Text>
-                </View>
+                </View> */}
 
                 <TouchableOpacity
                   onPress={handleLogin}
                   className="bg-[#0cc6bd] rounded-xl py-3"
                 >
                   <Text className="text-white text-center text-base font-bold">
-                    Login
+                    Ingresar
                   </Text>
                 </TouchableOpacity>
 
@@ -126,10 +126,10 @@ const Login = () => {
                   </Text>
                 )}
 
-                <Text className="text-center text-sm mt-6 text-gray-600">
+                {/* <Text className="text-center text-sm mt-6 text-gray-600">
                   Don&apos;t have an account?{" "}
                   <Text className="text-[#0cc6bd] font-semibold">Sign up</Text>
-                </Text>
+                </Text> */}
               </View>
             </View>
           </ScrollView>

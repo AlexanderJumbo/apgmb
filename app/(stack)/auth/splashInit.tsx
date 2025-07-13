@@ -24,14 +24,15 @@ export default function SplashScreen() {
       <View className="flex-1 justify-end">
         <View className="px-10 mt-5 bg-white pb-10 rounded-t-[40px]">
           <Text className="text-3xl font-bold text-gray-800 text-center">
-            Welcome
+            Bienvenido
           </Text>
           <Text className="text-center text-gray-500 mt-2 mb-10">
-            Lorem ipsum dolor sit amet consectetur. Lorem id sit
+            APGMB, una aplicación para automatización del proceso de toma de
+            lectura del servicio de agua potable
           </Text>
 
           <TouchableOpacity
-            className="bg-[#FF7F7F] w-14 h-14 rounded-full items-center justify-center self-end"
+            className="bg-[#0cc6bd] w-14 h-14 rounded-full items-center justify-center self-end"
             onPress={() => router.push("/(stack)/auth")}
           >
             <Text className="text-white text-xl font-bold">{">"}</Text>

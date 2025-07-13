@@ -20,12 +20,15 @@ const Index = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#F7F8FA]">
-      <ScrollView contentContainerStyle={{ padding: 20 }} className="flex-1">
+      <ScrollView
+        contentContainerStyle={{
+          flex: 1,
+          justifyContent: "center",
+          padding: 20,
+        }}
+        className="flex-1"
+      >
         <View className="bg-white rounded-3xl p-6 shadow-xl">
-          <Text className="text-2xl font-bold text-black mb-4">
-            Edita tu perfil
-          </Text>
-
           <TouchableOpacity
             onPress={logoutClick}
             className="mt-4 bg-red-500 rounded-xl p-3"
