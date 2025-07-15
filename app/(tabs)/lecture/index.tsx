@@ -22,9 +22,14 @@ const Index = () => {
   const userId = useAuthStore((state) => state.userId);
   console.log("🚀 ~ Index ~ jwt:", jwt);
 
-  const [metersList, setMetersList] = useState([]);
+  //const [metersList, setMetersList] = useState([]);
+  const [metersList, setMetersList] = useState<
+    { key: string; value: string }[]
+  >([]);
   console.log("🚀 ~ Index ~ metersList:", metersList);
   const [hasCurrentLecture, setHasCurrentLecture] = useState(false);
+
+  const [selectedMeter, setSelectedMeter] = useState("");
 
   const [form, setForm] = useState({
     meter: "",
@@ -55,17 +60,20 @@ const Index = () => {
           const data = await res.json();
           console.log("🚀 ~ meters ~ data:", data);
 
-          const dataMapped = data
-            .filter(
-              (item: any) =>
-                item.serial !== null &&
-                item.serial !== undefined &&
-                item.serial !== ""
-            )
-            .map((item: any) => ({
-              key: item.meterId.toString(),
-              value: item.serial,
-            }));
+          const dataMapped = [
+            { key: "", value: "Seleccione un medidor" },
+            ...data
+              .filter(
+                (item: any) =>
+                  item.serial !== null &&
+                  item.serial !== undefined &&
+                  item.serial !== ""
+              )
+              .map((item: any) => ({
+                key: item.meterId.toString(),
+                value: item.serial,
+              })),
+          ];
 
           setMetersList(dataMapped);
         } catch (error) {
@@ -75,12 +83,41 @@ const Index = () => {
 
       meters();
 
-      // Cleanup opcional si se necesita
+      // Cleanup
       return () => {
-        // por ejemplo: limpiar estados, cancelar requests, etc.
+        // AQUÍ limpiar estados, cancelar requests, etc.
       };
-    }, [jwt]) // se vuelve a ejecutar si cambia el token
+    }, [jwt])
   );
+
+  const clearFields = () => {
+    setForm({
+      meter: "",
+      name: "",
+      prevLecture: 0,
+      currentLecture: 0,
+      observation: "",
+      accountLecture: 0,
+      operator: Number(userId),
+    });
+    setSelectedMeter("");
+    setHasCurrentLecture(false);
+  };
+
+  const areCompleteFields =
+    form.meter !== "" &&
+    form.name !== "" &&
+    //form.prevLecture !== 0 &&
+    form.currentLecture !== 0 &&
+    form.observation !== "" &&
+    form.accountLecture !== 0 &&
+    selectedMeter !== "";
+
+  useEffect(() => {
+    if (form.meter === "") {
+      setSelectedMeter("");
+    }
+  }, [form.meter]);
 
   useEffect(() => {
     if (!form.meter) return;
@@ -129,32 +166,6 @@ const Index = () => {
         const hasLecture = await hasLectureRequest.json();
         console.log("🚀 ~ user ~ hasLecture:", hasLecture);
         setHasCurrentLecture(hasLecture);
-
-        // const res2 = await fetch(
-        //   `${BASE_URL}account/by-user/${data.idUsuario}`,
-        //   {
-        //     method: "GET",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: `Bearer ${jwt}`,
-        //     },
-        //   }
-        // );
-
-        // if (!res2.ok) {
-        //   setForm((prevForm) => ({
-        //     ...prevForm,
-        //     accountLecture: 0,
-        //   }));
-        //   throw new Error("Credenciales inválidas");
-        // }
-
-        // const data2 = await res2.json();
-        // setForm((prevForm) => ({
-        //   ...prevForm,
-        //   accountLecture: data2.accountId,
-        // }));
-        //console.log("🚀 ~ user ~ res2:", data2);
       } catch (error) {
         console.error("Error al obtener medidores:", error);
       }
@@ -166,7 +177,9 @@ const Index = () => {
   const handleChange = (field: string, value: string | number) => {
     console.log("🚀 ~ handleChange ~ value:", value);
     console.log("🚀 ~ handleChange ~ field:", field);
-    setForm({ ...form, [field]: value });
+    if (value === "") clearFields();
+    //setForm({ ...form, [field]: value });
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const registerLecture = async () => {
@@ -188,7 +201,7 @@ const Index = () => {
     if (response.idLecture === 0 || response.idLecture === null) {
       Toast.show({
         type: "error",
-        text1: "No puedo se registrada la lectura",
+        text1: "La lectura no pudo ser registrada con éxito",
         text2: "Verifique los datos antes de guardar",
       });
     } else {
@@ -197,8 +210,7 @@ const Index = () => {
         text1: "Lectura registrada",
         text2: "Tu lectura fue enviada correctamente 👌",
       });
-      // Aquí podrías enviar al backend, por ejemplo:
-      // await saveLecture(form)
+      clearFields();
     }
   };
 
@@ -212,11 +224,19 @@ const Index = () => {
           </Text>
 
           <SelectList
-            setSelected={(val: string) => handleChange("meter", val)}
+            //key={form.meter}
+            //setSelected={(val: string) => handleChange("meter", val)}
+            setSelected={(val: string) => {
+              setSelectedMeter(val);
+              handleChange("meter", val);
+            }}
             data={metersList}
             save="key"
             boxStyles={{ backgroundColor: "#f3f4f6", borderRadius: 12 }}
             dropdownStyles={{ backgroundColor: "#f3f4f6", borderRadius: 12 }}
+            defaultOption={metersList.find(
+              (item) => item.key === selectedMeter
+            )}
             placeholder="Seleccione un medidor"
           />
 
@@ -263,10 +283,6 @@ const Index = () => {
             multiline
             numberOfLines={6}
           />
-          {/* <Text className="text-base font-bold text-black">
-            Consumo actual:{" "}
-            {Math.max(0, form.currentLecture - form.prevLecture)}
-          </Text> */}
 
           <View className="mt-2 p-3 bg-gray-100 rounded-xl">
             <Text className="text-black mb-1">Resumen</Text>
@@ -301,9 +317,9 @@ const Index = () => {
 
           {/* bg-red-500 */}
           <TouchableOpacity
-            className={`mt-6 ${hasCurrentLecture ? "bg-[#454547]" : "bg-[#1C1C1E]"} rounded-xl p-3`}
+            className={`mt-6 ${hasCurrentLecture || !areCompleteFields ? "bg-[#454547]" : "bg-[#22c194]"} rounded-xl p-3`}
             onPress={registerLecture}
-            disabled={hasCurrentLecture}
+            disabled={hasCurrentLecture || !areCompleteFields}
           >
             <Text className="text-white text-center font-semibold">SUBMIT</Text>
           </TouchableOpacity>

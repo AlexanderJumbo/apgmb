@@ -46,38 +46,29 @@ const Login = () => {
   };
 
   const androidKeyboardOffset = Platform.select({
-    ios: 0, // iOS maneja mejor el offset automáticamente con "padding" o "height"
-    android: -screenHeight * 0.1, // Un valor negativo para empujar el contenido hacia arriba
-    // Puedes ajustar 0.25 (25% de la altura de la pantalla)
-    // o probar un valor fijo como -150
+    ios: 0,
+    android: -screenHeight * 0.1,
   });
+
+  const areCompleteFields = username !== "" && password !== "";
 
   return (
     <KeyboardAvoidingView
       className="flex-1"
-      // Usa "padding" para ambas plataformas para un comportamiento más consistente.
-      // "height" también podría funcionar, pero "padding" suele ser más flexible.
       behavior={Platform.OS === "ios" ? "padding" : "padding"}
-      // Aplica el offset condicional.
       keyboardVerticalOffset={androidKeyboardOffset}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="flex-1 bg-white relative">
-          {/* Fondo rosa fijo */}
           <View
-            className="absolute top-0 left-0 right-0 bg-[#0cc6bd] h-[300px] rounded-b-[60px]"
+            className="absolute top-0 left-0 right-0 bg-[#22c194] h-[300px] rounded-b-[60px]"
             style={{ zIndex: 0 }}
           />
 
           <ScrollView
             contentContainerStyle={{ flexGrow: 1 }}
             keyboardShouldPersistTaps="handled"
-            // Desactiva el desplazamiento visual por defecto si no es deseado,
-            // pero mantenlo para poder scrollear si hay muchos inputs.
-            // Para una experiencia más controlada, a veces se puede jugar con `scrollEnabled`
-            // pero para formularios, lo mejor es dejarlo habilitado.
           >
-            {/* Contenido encima del fondo */}
             <View
               className="flex-1 justify-end relative"
               style={{ zIndex: 1, marginTop: 150 }}
@@ -113,7 +104,8 @@ const Login = () => {
 
                 <TouchableOpacity
                   onPress={handleLogin}
-                  className="bg-[#0cc6bd] rounded-xl py-3"
+                  className={`${!areCompleteFields ? "bg-[#454547]" : "bg-[#22c194]"} rounded-xl py-3`}
+                  disabled={!areCompleteFields}
                 >
                   <Text className="text-white text-center text-base font-bold">
                     Ingresar

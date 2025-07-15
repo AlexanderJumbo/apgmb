@@ -14,6 +14,7 @@ import { saveAccount, updateAccount } from "@/services/account/account";
 import { useAuthStore } from "@/store/authStore";
 import { useFocusEffect } from "@react-navigation/native";
 import { BASE_URL } from "@/config";
+import Toast from "react-native-toast-message";
 
 export interface AccountForm {
   accountId: number;
@@ -74,6 +75,21 @@ const AccountModal = ({
     setForm({ ...form, [field]: value });
   };
 
+  const areCompleteFields =
+    // form.accountId !== 0 &&
+    // form.userId !== 0 &&
+    // form.meterId !== 0 &&
+    form.name !== "" &&
+    form.lastname !== "" &&
+    form.dni !== "" &&
+    form.email !== "" &&
+    form.address !== "" &&
+    form.phone !== "" &&
+    form.meterNumber !== "" &&
+    form.meterMark !== "" &&
+    form.predialCode !== "" &&
+    form.nameSector !== "";
+
   const handleNext = () => setCurrentStep((s) => s + 1);
   const handleBack = () => setCurrentStep((s) => s - 1);
 
@@ -84,9 +100,17 @@ const AccountModal = ({
         ? await saveAccount(form, jwt || "")
         : await updateAccount(form, jwt ?? "");
     if (response?.id === 0 || response?.id === null) {
-      alert("Error al guardar");
+      Toast.show({
+        type: "error",
+        text1: "No puedo se registrada la lectura",
+        text2: "Verifique los datos antes de guardar",
+      });
     } else {
-      alert("¡Formulario enviado con éxito!");
+      Toast.show({
+        type: "success",
+        text1: `Cuenta ${editId === 0 ? "registrada" : "actualizada"} con éxito`,
+        text2: "Verifique los datos antes de guardar",
+      });
       onClose();
       onRefresh?.();
     }
@@ -131,7 +155,7 @@ const AccountModal = ({
   useEffect(() => {
     if (visible) {
       if (editId === 0) {
-        // NUEVA CUENTA — limpiar
+        // CREAR NUEVA CUENTA
         setForm({
           accountId: 0,
           userId: 0,
@@ -149,7 +173,7 @@ const AccountModal = ({
           role: "",
         });
       } else if (defaultValues) {
-        // EDICIÓN — cargar valores existentes
+        // EDITAR CUENTA
         setForm({
           accountId: defaultValues.accountId || 0,
           userId: defaultValues.userId || 0,
@@ -323,8 +347,9 @@ const AccountModal = ({
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
-                  className="bg-green-600 rounded-xl p-3 flex-1 ml-2"
+                  className={`${!areCompleteFields ? "bg-[#8cb0a6]" : "bg-[#22c194]"} rounded-xl p-3 flex-1 ml-2`}
                   onPress={handleSubmit}
+                  disabled={!areCompleteFields}
                 >
                   <Text className="text-white text-center font-semibold">
                     ENVIAR

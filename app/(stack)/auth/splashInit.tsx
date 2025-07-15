@@ -1,19 +1,9 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  ImageBackground,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 
 export default function SplashScreen() {
-  const navigation = useNavigation();
-
   return (
     <View className="flex-1 bg-white">
-      {/* Fondo rosa con curva */}
       {/* <Image
         source={require("../assets/bg.png")}
         className="absolute top-0 left-0 w-full h-1/2"
@@ -32,7 +22,7 @@ export default function SplashScreen() {
           </Text>
 
           <TouchableOpacity
-            className="bg-[#0cc6bd] w-14 h-14 rounded-full items-center justify-center self-end"
+            className="bg-[#22c194] w-14 h-14 rounded-full items-center justify-center self-end"
             onPress={() => router.push("/(stack)/auth")}
           >
             <Text className="text-white text-xl font-bold">{">"}</Text>

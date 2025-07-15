@@ -1,7 +1,6 @@
 import { Tabs } from "expo-router";
 import "../global.css";
 import { Ionicons } from "@expo/vector-icons";
-import HomeScreen from "./home";
 import Toast from "react-native-toast-message";
 
 export default function Layout() {

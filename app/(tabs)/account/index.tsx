@@ -11,15 +11,12 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { BASE_URL } from "@/config";
 import { useCallback, useState } from "react";
-import { useRouter } from "expo-router";
 import { useAuthStore } from "@/store/authStore";
 import { AccountList } from "@/models/account/aacountList";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AccountModal, { AccountForm } from "@/components/shared/Modal";
-import { getAllAccounts } from "@/services/account/account";
+import AccountModal from "@/components/shared/Modal";
 
 export default function AppointmentsScreen() {
-  const router = useRouter();
   const jwt = useAuthStore((state) => state.jwt);
   const [accountsList, setAccountsList] = useState();
   const [filters, setFilters] = useState<{
@@ -37,11 +34,8 @@ export default function AppointmentsScreen() {
   const [defaultValues, setDefaultValues] = useState<Partial<AccountList>>({});
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
-  //console.log("🚀 ~ AppointmentsScreen ~ searchText:", searchText);
 
   const openModal = (id: number, account?: Partial<AccountList>) => {
-    //console.log("🚀 ~ openModal ~ account:", account);
-
     setEditId(id);
     setDefaultValues(account || {});
     setModalVisible(true);
@@ -62,7 +56,7 @@ export default function AppointmentsScreen() {
   function buildFilterQuery(filters: any) {
     const params = [];
 
-    // Solo filtra por isActive si NO es 'todas'
+    // Solo filtra por isActive si NO es all
     if (
       !filters.all &&
       (filters.isActive === true || filters.isActive === false)
@@ -81,14 +75,6 @@ export default function AppointmentsScreen() {
   const getAllAccounts = async (jwt: string) => {
     const query = buildFilterQuery(filters);
     console.log("🚀 ~ getAllAccounts ~ query:", query);
-    // const filtersFull = filters.all
-    //   ? ""
-    //   : filters.sector !== "" && filters.isActive
-    //     ? `?isActive=${filters.isActive}&sector=${filters.sector}`
-    //     : filters.isActive || !filters.isActive
-    //       ? `?isActive=${filters.isActive}`
-    //       : `?sector=${filters.sector}`;
-    // console.log("🚀 ~ getAllAccounts ~ filtersFull:", filtersFull);
 
     const res = await fetch(`${BASE_URL}account/all${query}`, {
       method: "GET",
@@ -99,7 +85,6 @@ export default function AppointmentsScreen() {
     });
     if (!res.ok) throw new Error("Ocurrió un error");
     const data = await res.json();
-    //console.log("getAllAccounts", data);
     setAccountsList(data);
   };
   useFocusEffect(
@@ -120,22 +105,11 @@ export default function AppointmentsScreen() {
     setShowSearch(!showSearch);
   };
 
-  const handleOutsidePress = () => {
-    if (showSearch) {
-      setShowSearch(false);
-      setSearchText("");
-      Keyboard.dismiss();
-    }
-  };
-
-  // const openModal = (id: number, account: AccountList) => {
-  //   console.log(id === 0 ? "Guardar" : "Editar");
-  // };
   const formatDate = (dateString: string) => {
     if (dateString === "") return "S/F";
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // enero = 0
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
@@ -183,7 +157,7 @@ export default function AppointmentsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-[#F7F8FA]">
       <View className="flex-1 bg-white p-4">
-        {/* Header buttons */}
+        {/* FILTROS */}
         <View className="flex-row justify-between items-center mb-4">
           <View className="flex-row space-x-2">
             <TouchableOpacity
@@ -264,7 +238,7 @@ export default function AppointmentsScreen() {
           </View>
         </View>
 
-        {/* FlatList */}
+        {/* LISTA DE REGISTROS */}
         <FlatList
           data={accountsList}
           keyExtractor={(account) => account.accountId.toString()}

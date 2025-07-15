@@ -1,40 +1,9 @@
-import {
-  Dimensions,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React, { useState } from "react";
+import { Dimensions, Image, ScrollView, Text, View } from "react-native";
+import React from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Ionicons } from "@expo/vector-icons";
 
 const HomeScreen = () => {
   const user = useAuthStore((state) => state.userId);
-  console.log("🚀 ~ HomeScreen ~ user:", user);
-
-  const [changeTab, setChangeTab] = useState("Home");
-
-  type Tab = {
-    name: string;
-    icon: keyof typeof Ionicons.glyphMap;
-  };
-
-  const changeTabClick = (tab: string) => {
-    setChangeTab(tab);
-  };
-
-  const tabs: Tab[] = [
-    { name: "Home", icon: "home-outline" },
-    { name: "Search", icon: "search-outline" },
-    { name: "Wishlist", icon: "heart-outline" },
-    { name: "Account", icon: "person-outline" },
-    { name: "Bag", icon: "cart-outline" },
-  ];
-
   const screenHeight = Dimensions.get("window").height;
   const imageHeight = screenHeight * 0.7;
 

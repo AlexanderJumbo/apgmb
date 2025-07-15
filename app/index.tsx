@@ -5,7 +5,11 @@ const Index = () => {
   const user = useAuthStore((state) => state.userId);
   console.log("🚀 ~ Index ~ user:", user);
 
-  return <Redirect href={"/(stack)/auth/splashInit"} />;
+  return user ? (
+    <Redirect href={"/(tabs)/home/index"} />
+  ) : (
+    <Redirect href={"/(stack)/auth/splashInit"} />
+  );
 };
 
 export default Index;
