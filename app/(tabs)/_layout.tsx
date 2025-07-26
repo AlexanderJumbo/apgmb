@@ -2,8 +2,10 @@ import { Tabs } from "expo-router";
 import "../global.css";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
+import { useTokenExpiryWatcher } from "@/hooks/useTokenExpiryWatcher";
 
 export default function Layout() {
+  useTokenExpiryWatcher();
   return (
     <>
       <Tabs

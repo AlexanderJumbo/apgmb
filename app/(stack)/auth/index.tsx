@@ -25,6 +25,18 @@ const Login = () => {
 
   const setAuth = useAuthStore((state) => state.setAuth);
 
+  const isValidateToken = (token: string) => {
+    console.log("🚀 ~ isValidateToken ~ token:", token);
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const expirationDate = payload.exp * 1000;
+    console.log(
+      "🚀 ~ isValidateToken ~ Date.now() < expirationDate;:",
+      Date.now() < expirationDate
+    );
+    return expirationDate;
+    //Date.now() < expirationDate;
+  };
+
   const handleLogin = async () => {
     try {
       console.log("🚀 ~ Login ~ username:", username);
@@ -32,7 +44,8 @@ const Login = () => {
 
       const data = await login(username, password);
       console.log("🚀 ~ handleLogin ~ data:", data);
-      setAuth(data);
+      const tokenExpiresAt = isValidateToken(data.jwt);
+      setAuth({ ...data, expiresAt: tokenExpiresAt });
 
       if (data.jwt !== "" && data.userId !== 0) {
         return router.push("/(tabs)/home");
