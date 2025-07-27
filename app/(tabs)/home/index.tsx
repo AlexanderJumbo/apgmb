@@ -1,9 +1,7 @@
 import { Dimensions, Image, ScrollView, Text, View } from "react-native";
 import React from "react";
-import { useAuthStore } from "@/store/authStore";
 
 const HomeScreen = () => {
-  const user = useAuthStore((state) => state.userId);
   const screenHeight = Dimensions.get("window").height;
   const imageHeight = screenHeight * 0.7;
 
@@ -14,7 +12,7 @@ const HomeScreen = () => {
         style={{ height: imageHeight }}
       >
         <Image
-          source={require("../../../assets/images/balao_bg.png")} // reemplaza con tu ruta
+          source={require("../../../assets/images/balao_bg.png")}
           resizeMode="contain"
           className="w-full h-full"
         />
@@ -28,7 +26,7 @@ const HomeScreen = () => {
           El Gobierno Autónomo Descentralizado de Balao se destaca por su
           compromiso con la comunidad, impulsando el desarrollo sostenible de la
           región. En su escudo se reflejan elementos clave como la agricultura,
-          la pesca y la identidad cultural.
+          la pesca y la identidad cultural
         </Text>
       </View>
     </ScrollView>

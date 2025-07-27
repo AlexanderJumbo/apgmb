@@ -6,7 +6,7 @@ const Index = () => {
   console.log("🚀 ~ Index ~ user:", user);
 
   return user ? (
-    <Redirect href={"/(tabs)/home/index"} />
+    <Redirect href={"/home"} />
   ) : (
     <Redirect href={"/(stack)/auth/splashInit"} />
   );

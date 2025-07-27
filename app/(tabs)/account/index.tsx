@@ -15,6 +15,7 @@ import { useAuthStore } from "@/store/authStore";
 import { AccountList } from "@/models/account/aacountList";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AccountModal from "@/components/shared/Modal";
+import Skeleton from "@/components/shared/Skeleton";
 
 export default function AppointmentsScreen() {
   const jwt = useAuthStore((state) => state.jwt);
@@ -34,6 +35,7 @@ export default function AppointmentsScreen() {
   const [defaultValues, setDefaultValues] = useState<Partial<AccountList>>({});
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const openModal = (id: number, account?: Partial<AccountList>) => {
     setEditId(id);
@@ -73,19 +75,25 @@ export default function AppointmentsScreen() {
   }
 
   const getAllAccounts = async (jwt: string) => {
-    const query = buildFilterQuery(filters);
-    console.log("🚀 ~ getAllAccounts ~ query:", query);
+    try {
+      setLoading(true);
+      const query = buildFilterQuery(filters);
+      console.log("🚀 ~ getAllAccounts ~ query:", query);
 
-    const res = await fetch(`${BASE_URL}account/all${query}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    if (!res.ok) throw new Error("Ocurrió un error");
-    const data = await res.json();
-    setAccountsList(data);
+      const res = await fetch(`${BASE_URL}account/all${query}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+      if (!res.ok) throw new Error("Ocurrió un error");
+      const data = await res.json();
+      setAccountsList(data);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
   useFocusEffect(
     useCallback(() => {
@@ -239,12 +247,16 @@ export default function AppointmentsScreen() {
         </View>
 
         {/* LISTA DE REGISTROS */}
-        <FlatList
-          data={accountsList}
-          keyExtractor={(account) => account.accountId.toString()}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-        />
+        {loading ? (
+          <Skeleton />
+        ) : (
+          <FlatList
+            data={accountsList}
+            keyExtractor={(account) => account.accountId.toString()}
+            renderItem={renderItem}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
 
         <AccountModal
           visible={modalVisible}

@@ -48,7 +48,7 @@ const Login = () => {
       setAuth({ ...data, expiresAt: tokenExpiresAt });
 
       if (data.jwt !== "" && data.userId !== 0) {
-        return router.push("/(tabs)/home");
+        return router.push("/home");
       } else {
         setHasErrors(!hasErrors);
       }
